@@ -14,14 +14,18 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: yarn  # Use caching for Yarn
+          cache: yarn
 
-      # Automatically install Yarn (you don't need it locally)
-      - name: Install Yarn
-        run: npm install --global yarn
+      # Install Yarn globally
+      - run: npm install --global yarn
 
-      # Install dependencies and generate yarn.lock if missing
-      - run: yarn install --frozen-lockfile || yarn install --force
+      # Install dependencies and generate `yarn.lock` if missing
+      - run: |
+          if [ ! -f yarn.lock ]; then
+            yarn install --force
+          else
+            yarn install --frozen-lockfile
+          fi
 
       # Run type-checking, linting, and tests
       - run: npm run type
@@ -30,35 +34,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-ghpages:
+  commit-yarn-lock:
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
-      # Checkout the repository
       - uses: actions/checkout@v4
-
-      # Set up Node.js and Yarn in the CI environment
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: yarn  # Use caching for Yarn
 
-      # Automatically install Yarn (no local Yarn installation needed)
-      - name: Install Yarn
-        run: npm install --global yarn
+      # Install Yarn globally
+      - run: npm install --global yarn
 
-      # Install dependencies and generate yarn.lock if needed
-      - run: yarn install --frozen-lockfile || yarn install --force
-
-      # Build the project
-      - run: npm run build:demo
-        env:
-          GITHUB_USER_CONTRIBUTION_API_ENDPOINT: https://snk-one.vercel.app/api/github-user-contribution/
-
-      # Deploy to GitHub Pages
-      - uses: crazy-max/ghaction-github-pages@v3.1.0
-        with:
-          target_branch: gh-pages
-          build_dir: packages/demo/dist
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN_GH_PAGES }}
+      # Ensure `yarn.lock` is committed if it was generated or changed
+      - run: |
+          if [ -f yarn.lock ]; then
+            git config --global user.email "actions@github.com"
+            git config --global user.name "GitHub Actions"
+            git add yarn.lock
+            git commit -m "ci: add/update yarn.lock"
+            git push
+          fi
