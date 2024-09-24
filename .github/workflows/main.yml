@@ -7,23 +7,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - uses: actions/checkout@v4
 
-      # Set up Node.js and Yarn in the CI environment
+      # Set up Node.js and Yarn
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20' # Explicitly set to Node.js version 20
           cache: yarn
 
       # Install Yarn globally
       - run: npm install --global yarn
 
-      # Install dependencies and generate `yarn.lock` if missing
+      # Check if yarn.lock exists, install dependencies, and create it if missing
       - run: |
           if [ ! -f yarn.lock ]; then
-            yarn install --force
+            echo "yarn.lock not found. Installing dependencies and creating yarn.lock..."
+            yarn install
           else
+            echo "yarn.lock found. Installing dependencies using lock file..."
             yarn install --frozen-lockfile
           fi
 
@@ -42,7 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20'
 
       # Install Yarn globally
       - run: npm install --global yarn
@@ -50,9 +51,13 @@ jobs:
       # Ensure `yarn.lock` is committed if it was generated or changed
       - run: |
           if [ -f yarn.lock ]; then
+            echo "yarn.lock found. Committing to the repository..."
             git config --global user.email "actions@github.com"
             git config --global user.name "GitHub Actions"
             git add yarn.lock
-            git commit -m "ci: add/update yarn.lock"
+            git commit -m "ci: add/update yarn.lock" || echo "No changes to commit"
             git push
+          else
+            echo "yarn.lock not found, nothing to commit."
           fi
+
