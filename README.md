@@ -16,6 +16,3 @@
 <p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=ananyakaligal&" alt="ananyakaligal" /></p>
 
 <img src="https://raw.githubusercontent.com/ananyakaligal/ananyakaligal/output/snake.svg" alt="Snake animation" />
-
-###
-
