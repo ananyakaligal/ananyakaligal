@@ -14,5 +14,3 @@
 <p>&nbsp;<img align="center" src="https://github-readme-stats.vercel.app/api?username=ananyakaligal&show_icons=true&locale=en" alt="ananyakaligal" /></p>
 
 <p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=ananyakaligal&" alt="ananyakaligal" /></p>
-
-<img src="https://raw.githubusercontent.com/ananyakaligal/ananyakaligal/output/snake.svg" alt="Snake animation" />
